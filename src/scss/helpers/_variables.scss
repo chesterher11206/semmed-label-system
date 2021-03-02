@@ -1,0 +1,11 @@
+$primary: #adc2d5;
+$secondary: #aeb9d3;
+$subject: #f0a1a8;
+$predicate: #f8b37f;
+$object: #f9e470;
+
+$theme-colors: (
+  "subject": $subject,
+  "predicate": $predicate,
+  "object": $object
+);

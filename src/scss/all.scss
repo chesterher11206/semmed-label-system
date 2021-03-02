@@ -1,0 +1,88 @@
+@import './helpers/variables';  // use local variables
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue/src/index.scss';
+
+body {
+    background-color: $primary;
+}
+
+footer {
+    text-align: center;
+    background-color: $primary;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+textarea {
+    resize: none;
+}
+
+#main-container {
+    height: 100%;
+    background-color: white;
+}
+
+#main {
+    min-height: 100vh;
+    padding: 2% 16%;
+}
+
+.main-navbar-brand {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.close-query-tab {
+    height: 18px;
+}
+
+.active-query-tab {
+    font-weight: bold;
+}
+
+.search-element {
+    background: #fff url(../assets/search.png) 8px 5px no-repeat;
+    background-size: 20px;
+    padding: 0 15px 0 30px;
+    border-radius: 15px;
+}
+
+.selection-block {
+    border: 1px solid lightgray;
+}
+
+.selection-dropdown {
+    overflow: scroll;
+    max-height: 150px;
+}
+
+.click-cursor {
+    cursor: pointer;
+}
+
+.sem-badge {
+    @extend .badge;
+    color: rgb(0, 0, 0);
+    font-size: unset;
+    font-weight: unset;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.sem-name {
+    display: inline;
+    font-size: xx-small;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.sem-badge.semgroup {
+    background-color: #92b3a5;
+}
+
+.sem-badge.semtype {
+    background-color: #648e93;
+}
+
+.label-column {
+    width: 15%;
+}
