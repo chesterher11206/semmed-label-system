@@ -1,4 +1,4 @@
-# Smart-Text-Playground
+# Semmed Label System
 
 ## Settings
 
