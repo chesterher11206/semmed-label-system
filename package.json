@@ -4,10 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --mode development --watch",
-    "build": "webpack --mode development",
-    "deploy": "webpack --mode production",
+    "api": "npx babel-node server/index.js",
     "start": "node app.js"
   },
   "author": "",
