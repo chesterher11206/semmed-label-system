@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "webpack --mode development --watch",
+    "build": "webpack --mode development",
     "api": "npx babel-node server/index.js",
     "start": "node app.js"
   },
