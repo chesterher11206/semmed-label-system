@@ -13,8 +13,8 @@ router.get('/fetchCase', (req, res) => {
     api.fetchCase(req, res);
 });
 
-router.get('/fetchDetail', (req, res) => {
-    api.fetchDetail(req, res);
+router.get('/fetchTriplet', (req, res) => {
+    api.fetchTriplet(req, res);
 });
 
 router.post('/updateLabel', jsonParser, (req, res) => {

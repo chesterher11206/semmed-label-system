@@ -25,7 +25,6 @@ export default new Router({
             path: '/query',
             name: 'query',
             component: query,
-            alias: '/query'
         },
         {
             path: '/label',

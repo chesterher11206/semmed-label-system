@@ -77,13 +77,23 @@
                 if (criteria)
                     return options.filter(opt => opt.toLowerCase().indexOf(criteria) > -1);
                 return options
+            },
+            active: function () {
+                return this.$route.query.case ? this.$route.query.case === this.caseName : this.caseName === 'AB';
             }
         },
         created: function () {
-            if (this.caseName === this.$route.query.case) {
-                this.value = JSON.parse(this.$route.query.filters)[`${this.elementType}_${this.optionType}`] || [];
+            if (this.active) {
+                this.value = this.$route.query.filters ? JSON.parse(this.$route.query.filters)[`${this.elementType}_${this.optionType}`] || [] : [];
             }
 		},
+        watch: {
+            "$route.query": function (val) {
+                if (this.active) {
+                    this.value = val.filters ? JSON.parse(val.filters)[`${this.elementType}_${this.optionType}`] || [] : [];
+                }
+            }
+        },
         methods: {
             onOptionClick: function({ option, addTag }) {
                 addTag(option)

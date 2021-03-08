@@ -1,5 +1,5 @@
 {
-  "name": "playground",
+  "name": "semmed-label-system",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -50,6 +50,7 @@
     "express": "^4.17.1",
     "jquery": "^3.5.1",
     "knex": "^0.21.16",
+    "knex-paginate": "^2.0.0",
     "mysql": "^2.18.1",
     "node-cache": "^5.1.2",
     "vue": "^2.6.12",

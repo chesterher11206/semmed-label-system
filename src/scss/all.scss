@@ -23,7 +23,7 @@ textarea {
 
 #main {
     min-height: 100vh;
-    padding: 2% 16%;
+    padding: 2% 10%;
 }
 
 .main-navbar-brand {
@@ -83,6 +83,33 @@ textarea {
     background-color: #648e93;
 }
 
+.progress-column {
+    width: 10%;
+}
+
 .label-column {
-    width: 15%;
+    width: 12%;
+}
+
+.sentence-column {
+    width: 40%
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+.progress {
+    position: relative;
+}
+
+.progress-bar-title {
+    position: absolute;
+    text-align: center;
+    line-height: 2rem;
+    overflow: hidden;
+    color: black;
+    right: 0;
+    left: 0;
+    top: 0;
 }

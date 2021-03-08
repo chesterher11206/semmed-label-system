@@ -3,9 +3,13 @@ $secondary: #aeb9d3;
 $subject: #f0a1a8;
 $predicate: #f8b37f;
 $object: #f9e470;
+$dark-table: #70757b;
+$light-table: #ffffff;
 
 $theme-colors: (
   "subject": $subject,
   "predicate": $predicate,
-  "object": $object
+  "object": $object,
+  "dark-table": $dark-table,
+  "light-table": $light-table
 );
