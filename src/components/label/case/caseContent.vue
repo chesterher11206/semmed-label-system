@@ -50,9 +50,9 @@
                     <span v-html="data.value"></span>
                 </template>
                 <template #cell(progress)="data">
-                    <b-progress :max="data.item.total" height="2rem">
+                    <b-progress :max="data.item.count" height="2rem">
                         <b-progress-bar :value="data.item.labeled"></b-progress-bar>
-                        <div class="progress-bar-title"><strong>{{ data.item.labeled }} / {{ data.item.total }}</strong></div>
+                        <div class="progress-bar-title"><strong>{{ data.item.labeled }} / {{ data.item.count }}</strong></div>
                     </b-progress>
                 </template>
                 <template #table-busy>
@@ -89,10 +89,9 @@
                 caseConfig: {},
                 caseOutput: [],
                 caseField: [
-                    { key: 'subject', label: 'Subject'},
+                    { key: 'subject', label: 'Subject', class: 'case-subject-column'},
                     { key: 'object', label: 'Object'},
-                    { key: 'count', label: 'Count (P / A)'},
-                    { key: 'range', label: 'Range'},
+                    { key: 'count', label: 'Count'},
                     { key: 'progress', label: 'Progress', class: 'progress-column' }
                 ],
                 isBusy: false
@@ -175,25 +174,24 @@
                 })
                 .then(data => {
                     this.caseOutput = data.map(row => {
-                        var subject = [row['SUBJECT_NAME']];
-                        subject = subject.concat(
+                        var subject = row['SUBJECT_NAME'];
+                        subject = subject + '<br>' + [].concat(
                             JSON.parse(row['SUBJECT_SEMGROUP']).map(s => `<span class="sem-badge semgroup"><p class="sem-name">${s}</p></span>`),
                             JSON.parse(row['SUBJECT_SEMTYPE']).map(s => `<span class="sem-badge semtype"><p class="sem-name">${s}</p></span>`)
                         ).join('&nbsp;');
 
-                        var object = [row['OBJECT_NAME']];
-                        object = object.concat(
+                        var object = row['OBJECT_NAME'];
+                        object = object + '<br>' + [].concat(
                             JSON.parse(row['OBJECT_SEMGROUP']).map(s => `<span class="sem-badge semgroup"><p class="sem-name">${s}</p></span>`),
                             JSON.parse(row['OBJECT_SEMTYPE']).map(s => `<span class="sem-badge semtype"><p class="sem-name">${s}</p></span>`)
                         ).join('&nbsp;');
 
-                        const count = `${row['COUNT_PREDICATION']} / ${row['COUNT_ARTICLE']}`;
-                        const range = row['FIRST_YEAR'] == row['LAST_YEAR'] ? `${row['FIRST_YEAR']}` : `${row['FIRST_YEAR']} - ${row['LAST_YEAR']}`;
+                        const count = row['COUNT_TRIPLET'];
                         const ids = row['TRIPLET_IDS'];
+                        const rids = row['REVERSE_TRIPLET_IDS'];
                         const labeled = row['labeled'];
-                        const total = JSON.parse(ids).length;
 
-                        return { subject, object, count, range, ids, labeled, total };
+                        return { subject, object, count, ids, rids, labeled };
                     });
                 })
                 .then(() => {
@@ -214,14 +212,16 @@
                 });
             },
             showDetail: function (items) {
-                var [subjectName] = items[0].subject.split('&nbsp;');
-                var [objectName] = items[0].object.split('&nbsp;');
-                var ids = items[0].ids;
+                const [subjectName] = items[0].subject.split('<br>');
+                const [objectName] = items[0].object.split('<br>');
+                const ids = items[0].ids;
+                const rids = items[0].rids;
 
                 this.$router.push({
                     name: 'detail',
                     query: {
-                        subjectName, objectName, ids
+                        subjectName, objectName,
+                        ids: JSON.stringify({ normal: ids, reverse: rids })
                     }
                 });
             }

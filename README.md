@@ -1,4 +1,4 @@
-# Semmed Label System
+# Medical Relation Labeling System
 
 ## Settings
 
@@ -14,17 +14,14 @@
 
     # For Development
     npm run build
-
-    # For production
-    npm run deploy
     ```
 
 3. Run
     ```
-    # Run website
-    node app.js
-    
     # Run API server
-    npx babel-node server/index.js
+    npm run api
+
+    # Run website
+    npm start
     ```
     And open http://localhost/9999 in browser

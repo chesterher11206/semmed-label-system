@@ -1,92 +1,101 @@
 <template>
-    <div>
-        <div class="pb-3 text-center">
-            <h3>{{ $route.query.subjectName }} <b-icon icon="arrow-left-right" class="mx-3"></b-icon> {{ $route.query.objectName }}</h3>
-        </div>
-
-        <b-table
-            id="tripletTable"
-            table-class="text-center"
-            table-variant="dark-table"
-            head-variant="dark"
-            :items="tripletOutput"
-            :fields="tripletField"
-            :per-page="tripletPerPage"
-            :current-page="tripletCurrentPage"
-            :busy="isBusy"
+    <div id="detail-main">
+        <div
+            v-for="(type, index) in tripletType"
+			:key="index"
+            class="pt-2"
         >
-            <template #cell(subject)="data">
-                <span v-html="data.value"></span>
-            </template>
+            <div class="pb-3 text-center" style="font-size: 22px;">
+                <strong>{{ tripletEntity[type].subject }}<b-icon icon="arrow-right" class="mx-3"></b-icon>{{ tripletEntity[type].object }}</strong>
+            </div>
 
-            <template #cell(object)="data">
-                <span v-html="data.value"></span>
-            </template>
+            <b-table
+                :id="`triplet-table-${type}`"
+                table-class="text-center"
+                table-variant="dark-table"
+                head-variant="dark"
+                :items="tripletOutput[type]"
+                :fields="tripletField"
+                :per-page="tripletPerPage"
+                :current-page="tripletCurrentPage[type]"
+                :busy="loadingTriplet[type]"
+            >
+                <template #head(count)="data">
+                    <span v-html="data.label"></span>
+                </template>
 
-            <template #cell(label)="data">
-                <b-form-select size="sm" v-model="data.item.label" :options="labelOptions" @change="labeling($event, data.index)"></b-form-select>
-            </template>
+                <template #cell(subject)="data">
+                    <span v-html="data.value"></span>
+                </template>
 
-            <template #cell(showDetails)="row">
-                <b-form-checkbox v-model="row.detailsShowing" @change="row.toggleDetails"></b-form-checkbox>
-            </template>
+                <template #cell(object)="data">
+                    <span v-html="data.value"></span>
+                </template>
 
-            <template #table-busy>
-                <div class="text-center text-danger my-2">
-                <b-spinner class="align-middle"></b-spinner>
-                <strong>Loading...</strong>
-                </div>
-            </template>
+                <template #cell(label)="data">
+                    <b-form-select size="sm" v-model="data.item.label" :options="labelOptions" @change="labeling(type, data.index, $event)"></b-form-select>
+                </template>
 
-            <template #row-details="row">
-                <div class="px-4 pt-2">
-                    <b-table
-                        :id="`detailTable-${row.index}`"
-                        table-class="text-center"
-                        table-variant="light-table"
-                        head-variant="light"
-                        small
-                        striped
-                        :items="row.item.predications"
-                        :fields="detailField"
-                        :per-page="detailPerPage"
-                        :current-page="detailCurrentPage[row.index]"
-                    >
-                        <template #cell(pmid)="data">
-                            <a :href="`https://pubmed.ncbi.nlm.nih.gov/${data.value}`" target="_blank">{{ data.value }}</a>
-                        </template>
+                <template #cell(showDetails)="row">
+                    <b-form-checkbox v-model="row.detailsShowing" @change="row.toggleDetails"></b-form-checkbox>
+                </template>
 
-                        <template #cell(subject)="data">
-                            <span v-html="data.value"></span>
-                        </template>
+                <template #table-busy>
+                    <div class="text-center text-danger my-2">
+                    <b-spinner class="align-middle"></b-spinner>
+                    <strong>Loading...</strong>
+                    </div>
+                </template>
 
-                        <template #cell(object)="data">
-                            <span v-html="data.value"></span>
-                        </template>
-                    </b-table>
-                    <b-pagination
-                        v-model="detailCurrentPage[row.index]"
-                        :total-rows="row.item.predications.length"
-                        :per-page="detailPerPage"
-                        :aria-controls="`detailTable-${row.index}`"
-                        align="center"
-                    ></b-pagination>
-                </div>
-            </template>
-        </b-table>
+                <template #row-details="row">
+                    <div class="px-4 pt-2">
+                        <b-table
+                            :id="`detailTable-${type}-${row.index}`"
+                            table-class="text-center"
+                            table-variant="light-table"
+                            head-variant="light"
+                            small
+                            striped
+                            :items="row.item.predications"
+                            :fields="detailField"
+                            :per-page="detailPerPage"
+                            :current-page="detailCurrentPage[type][row.index]"
+                        >
+                            <template #cell(pmid)="data">
+                                <a :href="`https://pubmed.ncbi.nlm.nih.gov/${data.value}`" target="_blank">{{ data.value }}</a>
+                            </template>
 
+                            <template #cell(subject)="data">
+                                <span v-html="data.value"></span>
+                            </template>
+
+                            <template #cell(object)="data">
+                                <span v-html="data.value"></span>
+                            </template>
+                        </b-table>
+                        <b-pagination
+                            v-model="detailCurrentPage[type][row.index]"
+                            :total-rows="row.item.predications.length"
+                            :per-page="detailPerPage"
+                            :aria-controls="`detailTable-${type}-${row.index}`"
+                            align="center"
+                        ></b-pagination>
+                    </div>
+                </template>
+            </b-table>
+
+            <b-pagination
+                v-model="tripletCurrentPage[type]"
+                :total-rows="tripletRows"
+                :per-page="tripletPerPage"
+                :aria-controls="`triplet-table-${type}`"
+                align="center"
+            ></b-pagination>
+        </div>
         <b-button class="mr-3" variant="outline-primary" v-on:click="updateLabel">
             <b-spinner small v-show="saving"></b-spinner>
             Save
         </b-button>
-
-        <b-pagination
-            v-model="tripletCurrentPage"
-            :total-rows="tripletRows"
-            :per-page="tripletPerPage"
-            aria-controls="tripletTable"
-            align="center"
-        ></b-pagination>
     </div>
 </template>
 
@@ -94,20 +103,25 @@
     export default {
         data() {
             return {
+                tripletType: ['normal', 'reverse'],
+                tripletEntity: {
+                    normal: { subject: this.$route.query.subjectName, object: this.$route.query.objectName },
+                    reverse: { subject: this.$route.query.objectName, object: this.$route.query.subjectName },
+                },
                 tripletPerPage: 20,
-                tripletCurrentPage: 1,
+                tripletCurrentPage: { normal: 1, reverse: 1 },
                 detailPerPage: 5,
-                detailCurrentPage: [],
-                rawTripletOutput: [],
-                tripletOutput: [],
+                detailCurrentPage: { normal: [], reverse: [] },
+                rawTripletOutput: { normal: [], reverse: [] },
+                tripletOutput: { normal: [], reverse: [] },
                 tripletField: [
-                    { key: 'subject', label: 'Subject'},
+                    { key: 'subject', label: 'Subject', class: 'triplet-subject-column'},
                     { key: 'predicate', label: 'Predicate' },
                     { key: 'object', label: 'Object'},
-                    { key: 'count', label: 'Count (P / A)'},
-                    { key: 'range', label: 'Range'},
+                    { key: 'count', label: 'Count<br>(Predication / Article)', class: 'count-column'},
+                    { key: 'range', label: 'Range', class: 'range-column'},
                     { key: 'label', label: 'Label', class: 'label-column' },
-                    { key: 'showDetails', label: 'Details' }
+                    { key: 'showDetails', label: 'Details', class: 'show-detail-column' }
                 ],
                 detailField: [
                     { key: 'pmid', label: 'PMID' },
@@ -122,9 +136,10 @@
                     { value: 1, text: 'Correct' },
                     { value: 0, text: 'Wrong' },
                     { value: 2, text: 'Uncertain' },
+                    { value: 3, text: 'Meaningless' }
                 ],
                 saving: false,
-                isBusy: false
+                loadingTriplet: { normal: false, reverse: false }
             }
         },
         computed: {
@@ -133,35 +148,44 @@
             }
         },
         created: function() {
-            this.getDetail();
+            this.getTriplet();
         },
         methods: {
-            getDetail: function () {
-                this.isBusy = true;
+            getTriplet: function () {
+                Promise.all(this.tripletType.map(t => this.fetchTriplet(t)))
+                .then(() => {
+                    console.log('Success');
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+            },
+            fetchTriplet: function (type) {
+                this.loadingTriplet[type] = true;
                 this.axios({
                     method: 'GET',
                     url: '/server/dbApi/fetchTriplet',
                     params: {
-                        subjectName: this.$route.query.subjectName,
-                        objectName: this.$route.query.objectName,
-                        ids: this.$route.query.ids
+                        subjectName: this.tripletEntity[type].subject,
+                        objectName: this.tripletEntity[type].object,
+                        ids: JSON.parse(this.$route.query.ids)[type]
                     }
                 })
                 .then(res => res.data)
                 .then(data => {
-                    this.detailCurrentPage = Array(data.length).fill(1);
-                    this.rawTripletOutput = data;
-                    this.tripletOutput = data.map(row => {
+                    this.detailCurrentPage[type] = Array(data.length).fill(1);
+                    this.rawTripletOutput[type] = data;
+                    this.tripletOutput[type] = data.map(row => {
                         const tripletId = row['TRIPLET_ID'];
 
-                        var subject = [row['SUBJECT_NAME']];
-                        subject = subject.concat(
+                        var subject = row['SUBJECT_NAME'];
+                        subject = subject + '<br>' + [].concat(
                             JSON.parse(row['SUBJECT_SEMGROUP']).map(s => `<span class="sem-badge semgroup"><p class="sem-name">${s}</p></span>`),
                             JSON.parse(row['SUBJECT_SEMTYPE']).map(s => `<span class="sem-badge semtype"><p class="sem-name">${s}</p></span>`)
                         ).join('&nbsp;');
 
-                        var object = [row['OBJECT_NAME']];
-                        object = object.concat(
+                        var object = row['OBJECT_NAME'];
+                        object = object + '<br>' + [].concat(
                             JSON.parse(row['OBJECT_SEMGROUP']).map(s => `<span class="sem-badge semgroup"><p class="sem-name">${s}</p></span>`),
                             JSON.parse(row['OBJECT_SEMTYPE']).map(s => `<span class="sem-badge semtype"><p class="sem-name">${s}</p></span>`)
                         ).join('&nbsp;');
@@ -171,9 +195,9 @@
                         const range = row['FIRST_YEAR'] == row['LAST_YEAR'] ? `${row['FIRST_YEAR']}` : `${row['FIRST_YEAR']} - ${row['LAST_YEAR']}`;
                         const label = row['LABEL'];
                         const predications = row['predications'].map(item => {
-                            var predicationSubject = row['SUBJECT_NAME'] + `&nbsp;<span class="sem-badge semtype"><p class="sem-name">${item['SUBJECT_SEMTYPE']}</p></span>`;
+                            var predicationSubject = row['SUBJECT_NAME'] + `<br><span class="sem-badge semtype"><p class="sem-name">${item['SUBJECT_SEMTYPE']}</p></span>`;
 
-                            var predicationObject = row['OBJECT_NAME'] + `&nbsp;<span class="sem-badge semtype"><p class="sem-name">${item['OBJECT_SEMTYPE']}</p></span>`;
+                            var predicationObject = row['OBJECT_NAME'] + `<br><span class="sem-badge semtype"><p class="sem-name">${item['OBJECT_SEMTYPE']}</p></span>`;
 
                             const pmid = item['PMID'];
                             const pyear = item['PYEAR'];
@@ -186,34 +210,49 @@
                     });
                 })
                 .then(() => {
-                    this.isBusy = false;
+                    this.loadingTriplet[type] = false;
                 })
                 .catch(error => {
                     console.log(error);
                 });
             },
-            labeling: function (label, index) {
-                this.rawTripletOutput[index].LABEL = label;
+            labeling: function (type, index, label) {
+                this.rawTripletOutput[type][index].LABEL = label;
             },
             updateLabel: function () {
+                if (localStorage.getItem('jwt') == null) {
+                    this.$router.push({
+                        name: 'login',
+                        query: {
+                            nextUrl: this.$route.fullPath
+                        }
+                    });
+                }
+
                 this.saving = true;
-                this.axios({
-                    method: 'POST',
-                    url: '/server/dbApi/updateLabel',
-                    data: {
-                        subjectName: this.$route.query.subjectName,
-                        objectName: this.$route.query.objectName,
-                        triplet: this.rawTripletOutput
-                    }
-                })
-                .then(res => res.data)
-                .then(data => {
-                    console.log(data.message);
+                this.callUpdate('normal')
+                .then(() => this.callUpdate('reverse'))
+                .then(() => {
                     this.saving = false;
                 })
                 .catch(error => {
                     console.log(error);
                     this.saving = false;
+                });
+            },
+            callUpdate: function (type) {
+                return this.axios({
+                    method: 'POST',
+                    url: '/server/dbApi/updateLabel',
+                    data: {
+                        subjectName: this.tripletEntity[type].subject,
+                        objectName: this.tripletEntity[type].object,
+                        triplet: this.rawTripletOutput[type]
+                    }
+                })
+                .then(res => res.data)
+                .catch(error => {
+                    console.log(error);
                 });
             }
         }

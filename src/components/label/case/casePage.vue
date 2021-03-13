@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="case-main">
         <b-tabs>
             <b-tab
                 v-for="(child, index) in children"

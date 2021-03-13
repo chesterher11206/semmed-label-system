@@ -153,16 +153,19 @@ const fetchCase = (req, res) => {
     .then(data => {
         var result = data.map(({
             TRIPLET_IDS,
+            REVERSE_TRIPLET_IDS,
             ...rest
         }) => {
-            const ids = JSON.parse(TRIPLET_IDS);
+            const ids = JSON.parse(TRIPLET_IDS).concat(JSON.parse(REVERSE_TRIPLET_IDS));
             return labelSystemKnex('CORRECTNESS')
             .select(labelSystemKnex.raw('count(if(LABEL IS NOT NULL, true, null)) as cnt'))
             .whereIn('TRIPLET_ID', ids)
             .then(resp => ({
                 ...rest,
                 TRIPLET_IDS,
-                labeled: JSON.parse(JSON.stringify(resp))[0].cnt
+                REVERSE_TRIPLET_IDS,
+                labeled: JSON.parse(JSON.stringify(resp))[0].cnt,
+                COUNT_TRIPLET: ids.length
             }))
         })
 
